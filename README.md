@@ -2,22 +2,18 @@
 
 Questa documentazione descrive la configurazione ottimale per l'esecuzione di modelli di linguaggio locali tramite **Ollama** su una scheda video **AMD Radeon RX 6600 (8GB)**. Il sistema è configurato per gestire correttamente la doppia GPU (Integrata + Dedicata).
 
----
-
-## 📋 Specifiche del Sistema
+# 📋 Specifiche del Sistema
 - **Sistema Operativo:** Ubuntu 22.04.5 LTS (Jammy Jellyfish)
 - **GPU Dedicata:** AMD Radeon RX 6600 (Navi 23) - **Bus ID: 03:00.0**
 - **GPU Integrata:** AMD Radeon Graphics - **Bus ID: 0e:00.0**
 - **Driver:** `amdgpu` con supporto ROCm
 
----
-
-## ⚙️ 1. Configurazione del Servizio (Metodo Obbligatorio)
+# ⚙️ 1. Configurazione del Servizio (Metodo Obbligatorio)
 È necessario utilizzare esclusivamente **systemctl** per la gestione del processo. L'uso diretto del comando `ollama serve` è sconsigliato in quanto ignora le configurazioni di sistema e le variabili d'ambiente ottimizzate per la GPU AMD.
 
 **Percorso del file di override:** `/etc/systemd/system/ollama.service.d/override.conf`
 
-### Procedura di modifica:
+## Procedura di modifica:
 1. Eseguire il comando di editing del servizio:
    ```bash
    sudo systemctl edit ollama.service
@@ -38,7 +34,7 @@ Questa documentazione descrive la configurazione ottimale per l'esecuzione di mo
 
 ---
 
-## 🚀 2. Gestione dei Modelli
+# 🚀 2. Gestione dei Modelli
 L'interazione con i modelli deve avvenire tramite l'interfaccia a riga di comando mentre il servizio `systemctl` è in esecuzione.
 
 | Operazione | Comando |
@@ -52,17 +48,17 @@ L'interazione con i modelli deve avvenire tramite l'interfaccia a riga di comand
 
 ---
 
-## 📊 3. Monitoraggio Hardware (GPU AMD)
+# 📊 3. Monitoraggio Hardware (GPU AMD)
 Il monitoraggio deve essere effettuato specificamente sul **Bus 03** per verificare l'effettivo utilizzo della scheda dedicata.
 
-### Verifica del carico (Radeontop)
+## Verifica del carico (Radeontop)
 L'utilizzo della GPU può essere osservato tramite il comando:
 ```bash
 sudo radeontop -b 03
 ```
 Si consiglia di monitorare la voce `Graphics pipe` per l'attività di calcolo e `VRAM` per l'allocazione della memoria.
 
-### Statistiche ROCm (SMI)
+## Statistiche ROCm (SMI)
 Per un controllo puntuale di temperature e frequenze:
 ```bash
 watch -n 0.5 rocm-smi
@@ -70,7 +66,7 @@ watch -n 0.5 rocm-smi
 
 ---
 
-## 🛠 4. Diagnostica e FAQ
+# 🛠 4. Diagnostica e FAQ
 
 **D: Come si verifica la velocità di generazione (token al secondo)?**
 R: È possibile visualizzare le statistiche prestazionali avviando il modello con il flag verbose:
@@ -247,3 +243,51 @@ Ecco la tabella definitiva per la manutenzione dei tutti sistemi:
 | **AnythingLLM** | Riesecuzione `./installer.sh` | Al rilascio (Notifica GUI) |
 | **Modelli LLM** | `ollama pull <nome_modello>` | Quando disponibili update |
 | **Web Scraping** | `playwright install chromium` | Solo se Aider lo richiede |
+
+
+
+# 9. Connessione remota: Tunneling SSH per Ollama (Windows ↔ Ubuntu)
+
+Questa configurazione permette di utilizzare la GPU del fisso dal portatile in totale sicurezza, senza esporre porte vulnerabili all'esterno.
+
+## 9.1. Configurazione Server (Ubuntu 22.04)
+Bisogna assicurarsi che il servizio sia configurato per l'uso della GPU AMD e l'ascolto locale.
+
+**File:** `/etc/systemd/system/ollama.service.d/override.conf`
+```ini
+[Service]
+Environment="HSA_OVERRIDE_GFX_VERSION=10.3.0"
+Environment="OLLAMA_INTEL_GPU=0"
+Environment="OLLAMA_HOST=127.0.0.1" # Per sicurezza o in generale per precisione si può inserire
+```
+
+## 9.2. Scambio di Chiavi SSH (Client → Server)
+Si eseguono queste operazioni dal client, quindi questi comandi ad esempio si possono eseguire da PowerShell per eliminare l'uso della password.
+
+```powershell
+# 1. Genera coppia di chiavi (invio per confermare i percorsi di default)
+ssh-keygen -t ed25519
+
+# 2. Invia la chiave pubblica al fisso (sostituisci 'utente' e 'ip_fisso')
+type $env:USERPROFILE\.ssh\id_ed25519.pub | ssh utente@ip_fisso "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+```
+
+## 9.3. Apertura Tunnel e Gestione (Comando Unico)
+Dal client, si deve eseguire questo comando per creare il ponte criptato. Ovviamente si deve mantenere questa finestra aperta durante l'uso del modello per poter mantenere la connessione.
+
+```powershell
+ssh -L 11434:localhost:11434 utente@ip_fisso
+```
+Quindi il traffico che proviene dal client in localhost sulla porta 11434 viene inoltrato al server sulla stessa porta e quindi il traffico verrà inoltrato automaticamente alla **RX 6600** remota
+
+## 9.4. Gestione Remota (all'interno della sessione SSH appena aperta):
+Si possono eseguire i seguenti comandi dal client per gestire ollama che si trova sul server:
+- `sudo systemctl start ollama`
+- `sudo radeontop -b 03`
+- `ollama list`
+- `ollama run <nome_modello>`
+
+## 9.5. Configurazione Software Client (AnythingLLM / Aider)
+Arrivati a questo punto della configurazione del tunnel ssh, consideriamo che **Ollama URL:** `http://127.0.0.1:11434`. Quindi possiamo configurare AnythingLLM e Aider dal client:
+- AnythingLLM: si seleziona Ollama come AI Provider e `http://127.0.0.1:11434` Endpoint URL.
+- Aider: `aider --model ollama/qwen2.5-coder:7b --browser --openai-api-base http://127.0.0.1:11434/v1`
