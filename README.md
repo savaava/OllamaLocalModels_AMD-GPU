@@ -258,7 +258,7 @@ Environment="OLLAMA_HOST=127.0.0.1" # Per sicurezza o in generale per precisione
 Dal client, si deve eseguire questo comando per creare il ponte criptato. Ovviamente si deve mantenere questa finestra aperta durante l'uso del modello per poter mantenere la connessione.
 
 ```powershell
-ssh -L 11434:localhost:11434 utente@ip_fisso
+ssh -L localhost:11434:localhost:11434 server_name@ip_server
 ```
 Quindi il traffico che proviene dal client in localhost sulla porta 11434 viene inoltrato al server sulla stessa porta e quindi il traffico verrà inoltrato automaticamente alla **RX 6600** remota
 
