@@ -194,34 +194,22 @@ aider --model ollama/qwen2.5-coder:7b --browser
 ## 🔍 Integrazione Web con Playwright
 
 Per estendere le capacità di analisi, Aider può utilizzare **Playwright**, una libreria di automazione del browser che permette all'intelligenza artificiale di "leggere" contenuti direttamente dal web.
-
-### Utilità di Playwright in Aider
-L'integrazione di Playwright consente al modello di:
-1. **Consultare Documentazione Online:** L'AI può accedere a siti web (es. documentazione ufficiale di librerie Python o framework JS) per ottenere esempi di codice aggiornati che non sono presenti nel suo dataset di addestramento originale.
-2. **Analizzare URL Specifici:** È possibile fornire ad Aider un indirizzo web affinché lo analizzi e utilizzi le informazioni contenute per scrivere o correggere il codice locale.
-3. **Modalità Headless:** Su Ubuntu 22.04, Playwright opera solitamente in modalità "headless" (senza finestra visibile), ottimizzando l'uso delle risorse di sistema.
+**VRAM:** Poiché il browser avviato da Playwright viene utilizzato per il "web scraping" testuale, l'impatto sulla VRAM è trascurabile.
 
 ### Installazione e Configurazione
 Qualora non fosse presente nel sistema, l'ambiente viene predisposto tramite i seguenti comandi:
 
 ```bash
-# Installazione della libreria Python
 python3 -m pip install playwright
 
 # Installazione dei binari del browser necessari
 playwright install chromium
 ```
 
-### ⚠️ Requisito Mandatorio: Git
+### ⚠️ Requisito: Git
 L'interfaccia grafica (`--browser`) richiede obbligatoriamente che la cartella di lavoro sia un repository **Git** inizializzato. 
-- Se la cartella non è sotto controllo di versione, la GUI non verrà avviata.
-- **Risoluzione:** Eseguire `git init` nella cartella di progetto prima di lanciare Aider.
+- **Risoluzione:** Eseguire `git init` nella cartella di progetto prima di lanciare Aider, aggiungere un branch main e fare una prima commit di inizializzazione.
 - **Vantaggio:** Questo permette alla GUI di gestire i rollback, mostrare i "diff" visivi e garantire la sicurezza del codice sorgente.
-
-### Impatto sulle Risorse
-L'attivazione di Playwright durante una sessione di Aider comporta l'avvio temporaneo di un'istanza di Chromium. 
-- **CPU/RAM:** Si verifica un picco temporaneo nell'uso del processore e della RAM durante il caricamento delle pagine web.
-- **VRAM:** Poiché il browser avviato da Playwright viene utilizzato per il "web scraping" testuale, l'impatto sulla memoria della **RX 6600** è trascurabile, lasciando quasi interamente gli 8GB a disposizione di Ollama.
 
 # 📋 7. Riepilogo Accesso Strumenti
 
