@@ -208,6 +208,12 @@ python3 -m pip install playwright
 playwright install chromium
 ```
 
+### ⚠️ Requisito Mandatorio: Git
+L'interfaccia grafica (`--browser`) richiede obbligatoriamente che la cartella di lavoro sia un repository **Git** inizializzato. 
+- Se la cartella non è sotto controllo di versione, la GUI non verrà avviata.
+- **Risoluzione:** Eseguire `git init` nella cartella di progetto prima di lanciare Aider.
+- **Vantaggio:** Questo permette alla GUI di gestire i rollback, mostrare i "diff" visivi e garantire la sicurezza del codice sorgente.
+
 ### Impatto sulle Risorse
 L'attivazione di Playwright durante una sessione di Aider comporta l'avvio temporaneo di un'istanza di Chromium. 
 - **CPU/RAM:** Si verifica un picco temporaneo nell'uso del processore e della RAM durante il caricamento delle pagine web.
