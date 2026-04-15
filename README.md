@@ -182,6 +182,14 @@ Per avviare l'interfaccia grafica, è necessario aggiungere il flag `--browser` 
 aider --model ollama/qwen2.5-coder:7b --browser
 ```
 
+### Attenzione
+L'interfaccia grafica (GUI) di Aider non è solo una finestra di chat, ma un vero e proprio pannello di controllo per le modifiche ai file. Poiché Aider usa Git per gestire i rollback (/undo), mostrare le differenze (diff) e garantire che il codice non venga corrotto, la GUI si rifiuta di avviarsi se non rileva un repository attivo:
+```bash
+cd ~/tuo_progetto
+git init
+aider --model ollama/qwen2.5-coder:7b --browser
+```
+
 ### Caratteristiche dell'interfaccia web:
 - **Gestione File facilitata:** È possibile aggiungere o rimuovere file dal contesto di lavoro tramite menu a tendina o icone dedicate, senza dover digitare i percorsi completi.
 - **Anteprima delle modifiche:** Le differenze (diff) tra il codice originale e quello generato dall'IA vengono evidenziate graficamente con i classici colori rosso (rimozioni) e verde (aggiunte).
@@ -227,3 +235,15 @@ L'attivazione di Playwright durante una sessione di Aider comporta l'avvio tempo
 | **Aider (Standard)** | Terminale (CLI) | `aider --model <nome_modello>` |
 | **Aider (Visual)** | Browser (GUI) | `aider --model <nome_modello> --browser` |
 | **Monitoraggio** | Terminale (CLI) | `sudo radeontop -b 03` |
+
+# 🔄 8. Tabella di Manutenzione Totale
+Ecco la tabella definitiva per la manutenzione dei tutti sistemi:
+
+| Componente | Comando di Aggiornamento | Frequenza Consigliata |
+| :--- | :--- | :--- |
+| **Driver/Sistema** | `sudo apt update && sudo apt upgrade` | Settimanale |
+| **Ollama (Core)** | `curl -fsSL https://ollama.com/install.sh \| sh` | Mensile |
+| **Aider (Coding)** | `pip install --upgrade aider-chat` | Settimanale |
+| **AnythingLLM** | Riesecuzione `./installer.sh` | Al rilascio (Notifica GUI) |
+| **Modelli LLM** | `ollama pull <nome_modello>` | Quando disponibili update |
+| **Web Scraping** | `playwright install chromium` | Solo se Aider lo richiede |
