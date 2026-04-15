@@ -233,7 +233,7 @@ L'attivazione di Playwright durante una sessione di Aider comporta l'avvio tempo
 | :--- | :--- | :--- |
 | **AnythingLLM** | Desktop (GUI) | `~/AnythingLLMDesktop.AppImage` |
 | **Aider (Standard)** | Terminale (CLI) | `aider --model <nome_modello>` |
-| **Aider (Visual)** | Browser (GUI) | `aider --model <nome_modello> --browser` |
+| **Aider (Visual)** | Browser (GUI) | `aider --model ollama/<nome_modello> --browser` |
 | **Monitoraggio** | Terminale (CLI) | `sudo radeontop -b 03` |
 
 # 🔄 8. Tabella di Manutenzione Totale
