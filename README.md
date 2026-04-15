@@ -254,10 +254,9 @@ Environment="OLLAMA_HOST=127.0.0.1" # Per sicurezza o in generale per precisione
 - Sul Server: inserire la chiave pubblica del client nel file `~/.ssh/authorized_keys`
   - Assicurati che i permessi sul server siano corretti, altrimenti SSH ignorerà le chiavi per sicurezza: `chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys`
 
-## 9.3. Apertura Tunnel e Gestione (Comando Unico)
+## 9.3. Local Forwarding: Apertura Tunnel e Gestione
 Dal client, si deve eseguire questo comando per creare il ponte criptato. Ovviamente si deve mantenere questa finestra aperta durante l'uso del modello per poter mantenere la connessione.
-
-```powershell
+```
 ssh -L localhost:11434:localhost:11434 server_name@ip_server
 ```
 Quindi il traffico che proviene dal client in localhost sulla porta 11434 viene inoltrato al server sulla stessa porta e quindi il traffico verrà inoltrato automaticamente alla **RX 6600** remota
@@ -273,3 +272,12 @@ Si possono eseguire i seguenti comandi dal client per gestire ollama che si trov
 Arrivati a questo punto della configurazione del tunnel ssh, consideriamo che **Ollama URL:** `http://127.0.0.1:11434`. Quindi possiamo configurare AnythingLLM e Aider dal client:
 - AnythingLLM: si seleziona Ollama come AI Provider e `http://127.0.0.1:11434` Endpoint URL.
 - Aider: `aider --model ollama/qwen2.5-coder:7b --browser --openai-api-base http://127.0.0.1:11434/v1`
+
+# 10. Utilizzo normale: procedimento completo
+Assumiamo che abbiamo già installato tutto e abbiamo già condiviso la chiave pubblica con il server.
+- Accendere il server e assicurarsi che sia attivo il servizio ssh, in particolare ssh lato server quindi controllare con `sudo systemctl status ssh`.
+- Dal client eseguiamo `ssh -L localhost:11434:localhost:11434 server_name@ip_server` che aprirà il terminale del server tramite il tunnel cifrato di ssh
+- Dal client possiamo ora eseguire `sudo systemctl start ollama`
+   - Quindi ora possiamo eseguire anche `ollama list` o `ollama run <nome_modello>` per aviare il modello direttamente su terminale
+   - Possiamo controllare che la connessione a Ollama del server sia avvenuta correttamente sul client andando su un browser di ricerca e digitare `localhost:11434`
+- Dal client ora possiamo aprire AnythingLLM e impostare Ollama come AI Provider e `http://127.0.0.1:11434` Endpoint URL.
