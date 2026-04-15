@@ -246,11 +246,11 @@ Ecco la tabella definitiva per la manutenzione dei tutti sistemi:
 
 
 
-# 9. Connessione remota: Tunneling SSH per Ollama (Windows ↔ Ubuntu)
+# 9. Connessione remotada un client: Tunneling SSH per Ollama col server
 
-Questa configurazione permette di utilizzare la GPU del fisso dal portatile in totale sicurezza, senza esporre porte vulnerabili all'esterno.
+Questa configurazione permette di utilizzare, da un client, la GPU del fisso dal portatile in totale sicurezza, senza esporre porte vulnerabili all'esterno.
 
-## 9.1. Configurazione Server (Ubuntu 22.04)
+## 9.1. Configurazione Server (Ubuntu)
 Bisogna assicurarsi che il servizio sia configurato per l'uso della GPU AMD e l'ascolto locale.
 
 **File:** `/etc/systemd/system/ollama.service.d/override.conf`
@@ -262,15 +262,9 @@ Environment="OLLAMA_HOST=127.0.0.1" # Per sicurezza o in generale per precisione
 ```
 
 ## 9.2. Scambio di Chiavi SSH (Client → Server)
-Si eseguono queste operazioni dal client, quindi questi comandi ad esempio si possono eseguire da PowerShell per eliminare l'uso della password.
-
-```powershell
-# 1. Genera coppia di chiavi (invio per confermare i percorsi di default)
-ssh-keygen -t ed25519
-
-# 2. Invia la chiave pubblica al fisso (sostituisci 'utente' e 'ip_fisso')
-type $env:USERPROFILE\.ssh\id_ed25519.pub | ssh utente@ip_fisso "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
-```
+- Sul client: `ssh-keygen -t ed25519` per generare la coppia di chiavi sul client (non c'è bisogno di farlo anche sul server)
+- Sul Server: inserire la chiave pubblica del client nel file `~/.ssh/authorized_keys`
+  - Assicurati che i permessi sul server siano corretti, altrimenti SSH ignorerà le chiavi per sicurezza: `chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys`
 
 ## 9.3. Apertura Tunnel e Gestione (Comando Unico)
 Dal client, si deve eseguire questo comando per creare il ponte criptato. Ovviamente si deve mantenere questa finestra aperta durante l'uso del modello per poter mantenere la connessione.
