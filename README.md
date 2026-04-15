@@ -1,6 +1,6 @@
 # 🦙 Guida Tecnica: Gestione di Ollama su Ubuntu 22.04 con GPU AMD
 
-Questa documentazione descrive la configurazione ottimale per l'esecuzione di modelli di linguaggio locali tramite **Ollama** su una scheda video **AMD Radeon RX 6600 (8GB)**. Il sistema è configurato per gestire correttamente la doppia GPU (Integrata + Dedicata).
+Questa documentazione descrive la configurazione ottimale per l'esecuzione di modelli di linguaggio locali tramite **Ollama** su una scheda video **AMD Radeon RX 6600 (8GB)**. Successivamente spiega come interfacciarsi con un client tramite ssh.
 
 # 📋 Specifiche del Sistema
 - **Sistema Operativo:** Ubuntu 22.04.5 LTS (Jammy Jellyfish)
