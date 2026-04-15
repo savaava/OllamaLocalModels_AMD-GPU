@@ -234,12 +234,12 @@ Ecco la tabella definitiva per la manutenzione dei tutti sistemi:
 
 
 
-# 9. Connessione remotada un client: Tunneling SSH per Ollama col server
+# 9. Connessione remota da un client: Tunneling SSH per Ollama col server
 
-Questa configurazione permette di utilizzare, da un client, la GPU del fisso dal portatile in totale sicurezza, senza esporre porte vulnerabili all'esterno.
+Questa configurazione permette di utilizzare, da un client, la GPU del server Ubuntu in sicurezza, senza esporre porte vulnerabili all'esterno.
 
 ## 9.1. Configurazione Server (Ubuntu)
-Bisogna assicurarsi che il servizio sia configurato per l'uso della GPU AMD e l'ascolto locale.
+Bisogna assicurarsi che il servizio sia configurato per l'ascolto locale (`localhost`)
 
 **File:** `/etc/systemd/system/ollama.service.d/override.conf`
 ```ini
