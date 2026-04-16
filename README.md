@@ -89,28 +89,18 @@ L'utilizzo di Ollama tramite terminale è solo il punto di partenza. Per sfrutta
 Ogni interfaccia gestisce i **Token di Contesto** e la **VRAM** in modo differente:
 - Le **WebUI** sono ideali per la conversazione generale.
 - I **Sistemi RAG** servono per consultare grandi moli di dati senza saturare la memoria video.
-   - Ad esempio AnythingLLM
+   - Ad esempio AnythingLLM che è un'ottima soluzione per analizzare documenti (PDF, TXT, DOCX) in locale.
+      - **Workspace Isolati:** AnythingLLM permette di creare aree di lavoro separate.
+   - **Efficienza VRAM:** I sistemi RAG come AnythingLLM utilizzano una tecnica di recupero (RAG) che invia alla GPU solo i frammenti di testo necessari per rispondere, permettendo di "interrogare" libri di migliaia di pagine su una scheda da 8GB.
 - Gli **Agenti CLI** servono per l'interazione diretta con il file system e il codice.
    - Ad esempio Aider, Claude Code
+   - **Accesso al File System:** A differenza delle chat comuni, gli Agenti CLI come Aider possono creare nuovi file e modificare quelli esistenti direttamente nelle cartelle di progetto.
 
-## 📚 5.1. AnythingLLM: Il Gestore della Conoscenza (RAG)
-**AnythingLLM** è la soluzione definitiva per analizzare documenti (PDF, TXT, DOCX) in locale. 
-- **Efficienza VRAM:** Utilizza una tecnica di recupero (RAG) che invia alla GPU solo i frammenti di testo necessari per rispondere, permettendo di "interrogare" libri di migliaia di pagine su una scheda da 8GB.
-- **Workspace Isolati:** Permette di creare aree di lavoro separate.
-- **Utilizzo ideale:** Consultazione di manuali, analisi di contratti, studio di documentazione tecnica complessa.
-- AnythingLLM non modifica i file, funge da lettore esperto.
-
-## 💻 5.2. Aider: Coding Assistant
-**Aider** è uno strumento da terminale che trasforma il modello (es. `qwen2.5-coder`) in un vero collaboratore capace di scrivere codice.
-- **Accesso al File System:** A differenza delle chat comuni, Aider può creare nuovi file e modificare quelli esistenti direttamente nelle cartelle di progetto.
-- **Integrazione Git:** Ogni modifica suggerita dall'AI può essere automaticamente seguita da un "commit", mantenendo traccia della cronologia del lavoro.
-- **Utilizzo ideale:** Scrittura di script Python, creazione di siti web, automazione di task su Ubuntu, correzione di bug.
-
-# 8. Connessione remota da un client: Tunneling SSH per Ollama col server
+# 6. Connessione remota da un client: Tunneling SSH per Ollama col server
 
 Questa configurazione permette di utilizzare, da un client, la GPU del server Ubuntu in sicurezza, senza esporre porte vulnerabili all'esterno.
 
-## 8.1. Configurazione Server (Ubuntu)
+## 6.1. Configurazione Server (Ubuntu)
 Bisogna assicurarsi che il servizio sia configurato per l'ascolto locale (`localhost`)
 
 **File:** `/etc/systemd/system/ollama.service.d/override.conf`
@@ -121,31 +111,31 @@ Environment="OLLAMA_INTEL_GPU=0"
 Environment="OLLAMA_HOST=127.0.0.1" # Per sicurezza o in generale per precisione si può inserire
 ```
 
-## 8.2. Scambio di Chiavi SSH (Client → Server)
+## 6.2. Scambio di Chiavi SSH (Client → Server)
 - Sul client: `ssh-keygen -t ed25519` per generare la coppia di chiavi sul client (non c'è bisogno di farlo anche sul server)
 - Sul Server: inserire la chiave pubblica del client nel file `~/.ssh/authorized_keys`
   - Assicurati che i permessi sul server siano corretti, altrimenti SSH ignorerà le chiavi per sicurezza: `chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys`
 
-## 8.3. Local Forwarding: Apertura Tunnel e Gestione
+## 6.3. Local Forwarding: Apertura Tunnel e Gestione
 Dal client, si deve eseguire questo comando per creare il ponte criptato. Ovviamente si deve mantenere questa finestra aperta durante l'uso del modello per poter mantenere la connessione.
 ```
 ssh -L localhost:11434:localhost:11434 server_name@ip_server
 ```
 Quindi il traffico che proviene dal client in localhost sulla porta 11434 viene inoltrato al server sulla stessa porta e quindi il traffico verrà inoltrato automaticamente alla **RX 6600** remota
 
-## 8.4. Gestione Remota (all'interno della sessione SSH appena aperta):
+## 6.4. Gestione Remota (all'interno della sessione SSH appena aperta):
 Si possono eseguire i seguenti comandi dal client per gestire ollama che si trova sul server:
 - `sudo systemctl start ollama`
 - `sudo radeontop -b 03`
 - `ollama list`
 - `ollama run <nome_modello>`
 
-## 8.5. Configurazione Software Client (AnythingLLM / Aider)
+## 6.5. Configurazione Software Client (AnythingLLM / Aider)
 Arrivati a questo punto della configurazione del tunnel ssh, consideriamo che **Ollama URL:** `http://127.0.0.1:11434`. Quindi possiamo configurare AnythingLLM e Aider dal client:
 - AnythingLLM: si seleziona Ollama come AI Provider e `http://127.0.0.1:11434` Endpoint URL.
 - Aider: `aider --model ollama/qwen2.5-coder:7b --browser --openai-api-base http://127.0.0.1:11434/v1`
 
-# 9. Utilizzo normale: procedimento completo
+# 7. Utilizzo normale: procedimento completo
 Assumiamo che abbiamo già installato tutto e abbiamo già condiviso la chiave pubblica con il server.
 - Accendere il server e assicurarsi che sia attivo il servizio ssh, in particolare ssh lato server quindi controllare con `sudo systemctl status ssh`.
 - Dal client eseguiamo `ssh -L localhost:11434:localhost:11434 server_name@ip_server` che aprirà il terminale del server tramite il tunnel cifrato di ssh
@@ -153,15 +143,3 @@ Assumiamo che abbiamo già installato tutto e abbiamo già condiviso la chiave p
    - Quindi ora possiamo eseguire anche `ollama list` o `ollama run <nome_modello>` per aviare il modello direttamente su terminale
    - Possiamo controllare che la connessione a Ollama del server sia avvenuta correttamente sul client andando su un browser di ricerca e digitare `localhost:11434`
 - Dal client ora possiamo aprire AnythingLLM e impostare Ollama come AI Provider e `http://127.0.0.1:11434` Endpoint URL.
-
-# 🔄 10. Tabella di Manutenzione Totale
-Ecco la tabella definitiva per la manutenzione dei tutti sistemi:
-
-| Componente | Comando di Aggiornamento | Frequenza Consigliata |
-| :--- | :--- | :--- |
-| **Driver/Sistema** | `sudo apt update && sudo apt upgrade` | Settimanale |
-| **Ollama (Core)** | `curl -fsSL https://ollama.com/install.sh \| sh` | Mensile |
-| **Aider (Coding)** | `pip install --upgrade aider-chat` | Settimanale |
-| **AnythingLLM** | Riesecuzione `./installer.sh` | Al rilascio (Notifica GUI) |
-| **Modelli LLM** | `ollama pull <nome_modello>` | Quando disponibili update |
-| **Web Scraping** | `playwright install chromium` | Solo se Aider lo richiede |
