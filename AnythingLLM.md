@@ -5,4 +5,4 @@
 - Nelle impostazioni si deve solo impostare Ollama come Provider LLM
 - Una volta impostato AnythingLLM rileva automaticamente i modelli che abbiamo scaricato, esattamente gli stessi che possiamo visualizzare con `ollama list`
 
-![alt text](images/image.png)
+![alt text](images/ollama_status.png)
